@@ -1,7 +1,6 @@
+### This is a Encrypter Application
 
-<h4>This is a Encrypter Application </h4>
-
-Hello guys . There is develop a simple encrypter that can encrypt your file with passwrod and you can also decrypt with same password . 
+Here i develop a simple Encrypter Python Application for encrypt your data with password . 
 
 ⚠️⚠️⚠️⚠️⚠️⚠️But For with attension⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
