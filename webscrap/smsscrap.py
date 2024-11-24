@@ -182,7 +182,7 @@ country_codes = {
 }
 
 
-def added_number(number, code):
+def added_number(*number, **code):
     url = "https://sms.tsupertools.com/livewire/message/backend.numbers.numbers"
 
     # Headers
@@ -205,10 +205,9 @@ def added_number(number, code):
 
     # Cookies
     cookies = {
-        "_session": "eyJpdiI6IjcwOXUydkZMTUE0eDVwVEpOd2k4aGc9PSIsInZhbHVlIjoiQWdmeWxWY0FJYXNnN2JHVC9zVktKRHdSNXFVWEFtUGgzTE1HcWRNQWYvVTlCbWllbnlEN3NEbmdzYXhHQUl1aFNBRDlNRnZWYmhKcDJ3cW1ybGRrSlRkZStaRk8wTkNEZktxMU50RVRkSHhwWEJhNnhEY1RHNzVKVXBvWXNuM3EiLCJtYWMiOiIyNTQ3MDk0NTBmNzgxNGNiYjRhMDQwMjI4Y2Q3ZDU4ZjVkNmUxYjk3MGVkOTdhNDU2ZTM0ZmU5N2IzMjZlMTFkIiwidGFnIjoiIn0%3D",
-        "XSRF-TOKEN": "eyJpdiI6IkJkZThuUmRrck8wcTA5ZS82dnpuaFE9PSIsInZhbHVlIjoieUo2RUI1dEhWNHR6RVhpZUZYa3JsWWR2QnBvcmYyTi9xRzdLcUFvd3ZkeHU2cGh3NjVoakpiQzdIbWtpVXdxNC8rOWhMZG9qdkRzVFlYV0FmNTVWTVZkSHlTME1pNkt1L1RSVnhYdm9VUUlwdW1PWTRYVTB6WVAwRGZpQ1h4K3QiLCJtYWMiOiJmMzllZjAyZWQxZTMxMzFhZmM1NGIyNGRmZTJjMGQ1NTFkZmZhZGNjYjRhMDY4NzljYzk0NTYzNWYyYjFjMmEzIiwidGFnIjoiIn0%3D",
-        "cf_clearance": "e5LfHoNzNsjLl9jv7.mq2DLfr5GFcha_cTq5gs.OhwQ-1731137485-1.2.1.1-TsQrN8hLMmBvdnupJ2t8VgmMzyTb.Qdma9pvVBCe6bm7H37wvU0c7rC2kBnsq1hfQGr8t9ok3T5Gtc5jUrnjnimaJF.6BR82CdN61jaljeGRJpFPc6qjbKa8FRr7bOFU8FLZ.YSkUey43KEGZmrcOAox7kWo.VA4jlG4xTewzlh0bclQIdctmxc4YASyfr_byD6Sh7Lbb2jmAYphwbap8d5SiFNWDNNPmHztMODgxZBZIgcTBw6bwYyhZ4gM6883U51rh4ndug7shE8EdEjDmw7Xf_7e0XlVz2hWQes4BBSgUWefvm6iqGzXz4QzIeX0Q_V2RESXUGXxd3wN5OpEFA",
-        "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d": "eyJpdiI6InhnUmdNNkhEWkVwMlVXMmtSY05rcHc9PSIsInZhbHVlIjoiM3U0TUJXbFRSRU0vNEc4NzNvK3RpUk94aDU5SGpFV2FPWHZJbUpmU0ZmbnpvY1h4SkU0dGFSblJVZ2VXSUwraG9kZVFNWUdXaDF0eUs0SVRJayttNk1qaWpVdTZPVUtWVHR1cmNiRWl5VXhYSEl1T2JhbnFKZXdVTDVvaldVYU8zUGlMVFEwMi8vQnViZFR5N2tod2ZCNjZ4NVFacjd5b0QwVklsL3dVZHZwL3JBTmV2eVNzc1hnWlhpcWRmRjhydTl2SUVqNE1JdWFCbEhlRmpKbzFaL3djdDhucTE3YXowMC9ITWFnWDFHTT0iLCJtYWMiOiJlOWRjZjAwNmU5MDcwNTdmOGU2N2IzOTFlZmFmM2Q1Y2I0YjQ2NjlhZDdmOTI0ZjYxMzcwZTM3NjRhN2FhYWJjIiwidGFnIjoiIn0%3D",
+        "_session": "eyJpdiI6ImNPZndKZE5tWDFGaHQ5Z3FTbno2ekE9PSIsInZhbHVlIjoiYThJZ1IrVHFJR1gxdkM2R0FUb3R4OFBFdFhWeDEzQVRjd0JIb2txWVJ5WVdYWHBqVWwrd1Nic2R5a2lSZ0k3NHl5Z3FTVDV3Q1NmNGpiMEFwUm5XbFFUVVB6djR1S0dwWWg0N0hYaklsbTR5U1hvYXBXbm12cVIwNW1jK0dXSDMiLCJtYWMiOiIxMzYzNWY4ZDZkNmJjOTgyM2I2YmRhYjhmN2YyZDA5YjQ4ZWM2NjRhYzkxODRmZDdiODk1MmRjOWUwMmNjMjc0IiwidGFnIjoiIn0%3D",
+        "XSRF-TOKEN": "eyJpdiI6ImZaMGZsV0dCZ2lpaHRLVXJrWlhQbFE9PSIsInZhbHVlIjoiZit2U0hoTE1oWit2eDNUNXoxOVR3dnBTUFJ6QkZoVjFXL2IwZ0VBQjBQdEtmTUVyRTljTW94R3NVbTBGWGE3WVBtR2pGK3lMZGVJSEZQVFdUamI4dzFrQ1lpMlNTY3NzNG1Nb0lCYTJHMGUyQndzeFFMMHY2MXFaQm9YRFRTdS8iLCJtYWMiOiIzOGY0Y2E0YzlmMzYzYTY4OTlmNjQ3NjZmMjAzOGRjNjQzZjJkMzIzMGY1M2RhMDViMmFlYWY2NGUyMmM0YjA0IiwidGFnIjoiIn0%3D",
+        "cf_clearance": "1WNV8OEUvTSbeNYr_M625fwG8QKWrQ3Ngfz75RxXwTE-1731516595-1.2.1.1-t9DXOxo97ADE4szDEgtPviq3HMnlebmSGAUMxz9joIHMrsm8.s2PthSL88oHqFOdTfh3e_JGksNC8rBC3m_zg18qtxqaLitzuro.uuWcLozF7dDwczugT0tNzr0MPP4BFaTya9VgXDM.AwREgPjtIsb6vZPbz9AwejzyW83d8Eb7ogINpLodcTnaKI8xU8OOW.PQMDIFINVbwR84Vnh2uCuUynQ74QhElw_9m7EI9CmC3CUFflQIaB4w1AzGherIaAxhuE8yvitAtXZeNDeuqjKo7eSCpwHfk9XExDcCs4plxhmfs.klEP8Dd1JqPl0.TT2kGhV8M7QSs2NZ8kUmkw",
     }
 
     # JSON payload
@@ -315,6 +314,7 @@ def added_number(number, code):
 
     # Making the POST request
     response = requests.post(url, headers=headers, cookies=cookies, json=data)
+    print(response.status_code)
 
 
 def smstome():
@@ -393,12 +393,13 @@ def smstome():
 
                     req = requests.get(request, headers=headers)
                     match = re.match(r"^\+(\d{1,3})", phone)
-                    if match:
-                        country_code = "+" + match.group(
-                            1
-                        )  # Get the matched country code
-                        country = country_codes.get(country_code)
-                        added_number(number.text.replace("+", ""), country)
+                    # if match:
+                    #     country_code = "+" + match.group(
+                    #         1
+                    #     )  # Get the matched country code
+                    #     country = country_codes.get(country_code)
+                    #     added_number(number.text.replace("+", ""), country)
+                    added_number(number.text.replace("+", ""))
                     print(req.status_code)
                     print("-" * 40)
                     # print(req.text)
@@ -467,22 +468,23 @@ def recivesms():
             req = requests.get(request, headers=headers)
             print(req.status_code)
             print("-" * 40)
-            match = re.match(r"^\+(\d{1,3})", number.text)
-            if match:
-                country_code = "+" + match.group(1)  # Get the matched country code
-                country = country_codes.get(country_code)
-                added_number(number.text.replace("+", ""), country)
-            # print(req.text)
+            # match = re.match(r"^\+(\d{1,3})", number.text)
+            # if match:
+            #     country_code = "+" + match.group(1)  # Get the matched country code
+            #     country = country_codes.get(country_code)
+            #     added_number(number.text.replace("+", ""), country)
+            # # print(req.text)
+            added_number(number.text.replace("+", ""))
             time.sleep(10)
 
 
-# threading.Thread(target=recivesms).start()
-# threading.Thread(target=smstome).start()
+threading.Thread(target=recivesms).start()
+threading.Thread(target=smstome).start()
 
-key_lengths = {len(key) for key in country_codes}
-print(key_lengths)
-match = re.match(r"^\+(\d{1,1})", "+97598328055")
-if match:
-    country_code = "+" + match.group(1)  # Get the matched country code
-    country = country_codes.get(country_code)
-    print(country)
+# key_lengths = {len(key) for key in country_codes}
+# print(key_lengths)
+# match = re.match(r"^\+(\d{1,1})", "+97598328055")
+# if match:
+#     country_code = "+" + match.group(1)  # Get the matched country code
+#     country = country_codes.get(country_code)
+#     print(country)
