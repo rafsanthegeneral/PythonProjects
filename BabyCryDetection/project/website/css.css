@@ -1,0 +1,16 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+#video-container {
+    position: relative;
+    display: inline-block;
+}
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+video {
+    border: 2px solid #000;
+}
