@@ -3,17 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css.css">
     <title>Child Monitoring System</title>
-  
+    <link rel="stylesheet" href="css.css">
 </head>
 <body>
-    <h1>Child Monitoring System</h1>
-    <div id="video-container">
-        <video id="video" autoplay muted playsinline></video>
-        <canvas id="overlay"></canvas>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Child Monitor</h1>
+        </header>
+
+        <!-- Dashboard -->
+        <main class="dashboard">
+            <section class="card location">
+                <h2>Real-Time Location</h2>
+                <div class="map-placeholder">Map goes here</div>
+            </section>
+
+            <section class="card health">
+                <h2>Health Stats</h2>
+                <div class="stats">
+                    <div>
+                        <span class="stat-value">8,000</span>
+                        <p>Steps Today</p>
+                    </div>
+                    <div>
+                        <span class="stat-value">500</span>
+                        <p>Calories Burned</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card alerts">
+                <h2>Recent Alerts</h2>
+                <ul>
+                    <li>Left Safe Zone at 2:15 PM</li>
+                    <li>Low Battery on Device</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="footer-nav">
+            <button>Dashboard</button>
+            <button>Location</button>
+            <button>Settings</button>
+        </footer>
     </div>
-    <p id="status"></p>
-    <script src="js.js"></script>
 </body>
 </html>
