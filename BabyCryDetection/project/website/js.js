@@ -52,7 +52,9 @@ async function getAllDocuments() {
     if (!snapshot.empty) {
       // Iterate through documents
       snapshot.forEach((doc) => {
+        var data = `Document ID: ${doc.id}, Data:` + doc.data().name;
         console.log(`Document ID: ${doc.id}, Data:`, doc.data());
+        document.querySelector("#showdata").innerHTML = data;
       });
     } else {
       console.log("No documents found in the collection!");

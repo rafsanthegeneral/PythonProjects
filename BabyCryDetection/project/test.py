@@ -8,6 +8,7 @@ import os
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import threading
 
 
 # Load the Haar Cascade for face detection
@@ -39,7 +40,7 @@ def main():
 
     while True:
         # Read a frame from the video capture
-        aduio_test()
+
         ret, frame = cap.read()
 
         if not ret:
@@ -195,3 +196,8 @@ def aduio_test(duration=5, fs=44100):
 
 
 main()
+
+while True:
+    aduio_test()
+    # audio = threading.Thread(target=aduio_test)
+    # audio.start()
