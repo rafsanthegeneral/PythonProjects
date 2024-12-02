@@ -9,7 +9,8 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import threading
-
+import firebase_admin
+from firebase_admin import firestore
 
 # Load the Haar Cascade for face detection
 def main():
@@ -197,7 +198,47 @@ def aduio_test(duration=5, fs=44100):
 
 main()
 
-while True:
-    aduio_test()
+# while True:
+#     aduio_test()
     # audio = threading.Thread(target=aduio_test)
     # audio.start()
+
+def test():
+    cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
+    firebase_admin.initialize_app(cred_obj)
+    db = firestore.client()
+    data = {
+    "Book1":
+    {
+        "Title": "The Fellowship of the Ring",
+        "Author": "J.R.R. Tolkien",
+        "Genre": "Epic fantasy",
+        "Price": 100
+    },
+    "Book2":
+    {
+        "Title": "The Two Towers",
+        "Author": "J.R.R. Tolkien",
+        "Genre": "Epic fantasy",
+        "Price": 100    
+    },
+    "Book3":
+    {
+        "Title": "The Return of the King",
+        "Author": "J.R.R. Tolkien",
+        "Genre": "Epic fantasy",
+        "Price": 100
+    },
+    "Book4":
+    {
+        "Title": "Brida",
+        "Author": "Paulo Coelho",
+        "Genre": "Fictionnn",
+        "Price": 100
+    }
+}
+    doc_ref = db.collection("test").document()
+    doc_ref.set(data)
+  
+    
+test()
