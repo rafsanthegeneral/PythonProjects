@@ -14,6 +14,9 @@ from firebase_admin import firestore
 
 # Load the Haar Cascade for face detection
 def main():
+    cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
+    firebase_admin.initialize_app(cred_obj)
+    db = firestore.client()
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
@@ -38,10 +41,11 @@ def main():
     # center_area = (frame_width // 2, frame_height // 2, frame_width // 2, frame_height // 2)
     # cv2.namedWindow('Child Monitoring System', cv2.WND_PROP_FULLSCREEN)
     # cv2.setWindowProperty('Child Monitoring System', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    audio = threading.Thread(target=aduio_test)
+    audio.start()
 
     while True:
         # Read a frame from the video capture
-
         ret, frame = cap.read()
 
         if not ret:
@@ -189,7 +193,7 @@ def aduio_test(duration=5, fs=44100):
         average_rmse = np.mean(rmse)
 
         return prediction[0] == 1 and average_rmse > intensity_threshold
-
+    
     if is_crying(audio_data, clf):
         print("Baby is crying!")
     else:
@@ -241,4 +245,3 @@ def test():
     doc_ref.set(data)
   
     
-test()
