@@ -12,11 +12,12 @@ import threading
 import firebase_admin
 from firebase_admin import firestore
 
+cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
+firebase_admin.initialize_app(cred_obj)
+db = firestore.client()
 # Load the Haar Cascade for face detection
 def main():
-    cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
-    firebase_admin.initialize_app(cred_obj)
-    db = firestore.client()
+
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
@@ -196,6 +197,11 @@ def aduio_test(duration=5, fs=44100):
     
     if is_crying(audio_data, clf):
         print("Baby is crying!")
+        data = {
+        "":"",
+}
+        doc_ref = db.collection("test").document()
+        doc_ref.set(data)
     else:
         pass
 
@@ -217,27 +223,6 @@ def test():
         "Title": "The Fellowship of the Ring",
         "Author": "J.R.R. Tolkien",
         "Genre": "Epic fantasy",
-        "Price": 100
-    },
-    "Book2":
-    {
-        "Title": "The Two Towers",
-        "Author": "J.R.R. Tolkien",
-        "Genre": "Epic fantasy",
-        "Price": 100    
-    },
-    "Book3":
-    {
-        "Title": "The Return of the King",
-        "Author": "J.R.R. Tolkien",
-        "Genre": "Epic fantasy",
-        "Price": 100
-    },
-    "Book4":
-    {
-        "Title": "Brida",
-        "Author": "Paulo Coelho",
-        "Genre": "Fictionnn",
         "Price": 100
     }
 }

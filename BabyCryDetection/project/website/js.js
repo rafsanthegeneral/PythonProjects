@@ -50,19 +50,31 @@ async function getAllDocuments() {
 
     // Check if the collection has documents
     if (!snapshot.empty) {
-      // Iterate through documents
+      // Clear the existing content in #showdata
+      const showDataElement = document.querySelector("#showdata");
+      showDataElement.innerHTML = ""; // Reset the content
+
+      // Iterate through documents and display them
       snapshot.forEach((doc) => {
-        var data = `Document ID: ${doc.id}, Data:` + doc.data().name;
-        console.log(`Document ID: ${doc.id}, Data:`, doc.data());
-        document.querySelector("#showdata").innerHTML = data;
+        const data = doc.data();
+        const dataString = `Document ID: ${doc.id}, Name: ${data.ref}`;
+        console.log(data);
+        document.querySelector("#showdata").innerHTML = JSON.stringify(doc.data());
+        // Create a paragraph element for each document
+        // const para = document.createElement("p");
+        // para.textContent = dataString;
+
+        // // Append the paragraph to #showdata
+        // showDataElement.appendChild(para);
       });
     } else {
       console.log("No documents found in the collection!");
+      document.querySelector("#showdata").textContent = "No data available.";
     }
   } catch (error) {
     console.error("Error fetching documents:", error);
+    document.querySelector("#showdata").textContent = "Error loading data.";
   }
 }
-
 // Call the function
 getAllDocuments();
