@@ -5,16 +5,22 @@ import numpy as np
 import librosa
 import soundfile as sf
 import os
+from pathlib import Path
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import threading
 import firebase_admin
 from firebase_admin import firestore
+import time
 
-cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
+cred_obj = firebase_admin.credentials.Certificate(
+    "D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json"
+)
 firebase_admin.initialize_app(cred_obj)
 db = firestore.client()
+
+
 # Load the Haar Cascade for face detection
 def main():
 
@@ -194,15 +200,19 @@ def aduio_test(duration=5, fs=44100):
         average_rmse = np.mean(rmse)
 
         return prediction[0] == 1 and average_rmse > intensity_threshold
-    
+
     if is_crying(audio_data, clf):
         print("Baby is crying!")
         data = {
-        "":"",
-}
+            "Crying": {
+                "Title": "The Fellowship of the Ring",
+                "Author": "J.R.R. Tolkien",
+                "Genre": "Epic fantasy",
+                "Price": 100,
+            }
+        }
         doc_ref = db.collection("test").document()
         doc_ref.set(data)
-    else:
         pass
 
 
@@ -210,23 +220,23 @@ main()
 
 # while True:
 #     aduio_test()
-    # audio = threading.Thread(target=aduio_test)
-    # audio.start()
+# audio = threading.Thread(target=aduio_test)
+# audio.start()
+
 
 def test():
-    cred_obj = firebase_admin.credentials.Certificate('D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json')
+    cred_obj = firebase_admin.credentials.Certificate(
+        "D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json"
+    )
     firebase_admin.initialize_app(cred_obj)
     db = firestore.client()
     data = {
-    "Book1":
-    {
-        "Title": "The Fellowship of the Ring",
-        "Author": "J.R.R. Tolkien",
-        "Genre": "Epic fantasy",
-        "Price": 100
+        "Book1": {
+            "Title": "The Fellowship of the Ring",
+            "Author": "J.R.R. Tolkien",
+            "Genre": "Epic fantasy",
+            "Price": 100,
+        }
     }
-}
     doc_ref = db.collection("test").document()
     doc_ref.set(data)
-  
-    
