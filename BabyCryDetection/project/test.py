@@ -13,17 +13,147 @@ import threading
 import firebase_admin
 from firebase_admin import firestore
 import time
+from datetime import datetime
+import requests
+import pickle
 
-cred_obj = firebase_admin.credentials.Certificate(
-    "D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json"
-)
+
+certificate_path = Path("../../../BabyCryFirebase.json")
+cred_obj = firebase_admin.credentials.Certificate(certificate_path)
 firebase_admin.initialize_app(cred_obj)
 db = firestore.client()
 
 
-# Load the Haar Cascade for face detection
-def main():
+# Function to get current time
+def get_internet_time():
+    response = requests.get(
+        "https://timeapi.io/api/Time/current/zone?timeZone=Asia/Dhaka"
+    )
+    response.raise_for_status()
+    data = response.json()
+    date_str = data["date"]  # '12/13/2024'
+    time_str = data["time"]  # '11:24'
+    current_datetime = datetime.strptime(f"{date_str} {time_str}", "%m/%d/%Y %H:%M")
+    return current_datetime
 
+
+current_time = get_internet_time()
+formatted_time = current_time.strftime("%d %b %I:%M %p").lower()
+
+
+# Feature extraction
+def extract_features(audio_data, fs=44100):
+    try:
+        mfccs = librosa.feature.mfcc(y=audio_data.astype(float), sr=fs, n_mfcc=13)
+        rmse = librosa.feature.rms(y=audio_data.astype(float))
+        zcr = librosa.feature.zero_crossing_rate(y=audio_data.astype(float))
+
+        features = np.hstack([np.mean(mfccs.T, axis=0), np.mean(rmse), np.mean(zcr)])
+        return features
+    except Exception as e:
+        print(f"Error extracting features: {e}")
+        return None
+
+
+# Load dataset (crying and simulated mislead data)
+def load_dataset(crying_path, num_fake_samples=50):
+    X, y = [], []
+
+    # Load all crying baby sounds
+    for file_name in os.listdir(crying_path):
+        if file_name.endswith(".ogg") or file_name.endswith(".wav"):
+            file_path = os.path.join(crying_path, file_name)
+            try:
+                audio_data, _ = librosa.load(file_path, sr=44100)
+                features = extract_features(audio_data)
+                if features is not None:
+                    X.append(features)
+                    y.append(1)  # Label for crying sound
+            except Exception as e:
+                print(f"Error loading {file_name}: {e}")
+
+    # Generate "fake" misleading sounds (random noise or silence)
+    for _ in range(num_fake_samples):
+        fake_audio = np.random.uniform(-0.01, 0.01, 44100)  # Random noise for 1 second
+        features = extract_features(fake_audio)
+        if features is not None:
+            X.append(features)
+            y.append(0)  # Label for misleading sound
+
+    print(f"Loaded {len(X)} samples. Crying: {y.count(1)}, Non-crying: {y.count(0)}")
+    return np.array(X), np.array(y)
+
+
+# Train SVM model
+def train_model():
+    crying_path = "data/301_Crying_baby/"
+    X, y = load_dataset(crying_path)
+
+    # Split the data
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    # Train an SVM classifier
+    model = SVC(kernel="linear", probability=True)
+    model.fit(X_train, y_train)
+
+    # Evaluate the model
+    y_pred = model.predict(X_test)
+    print(f"Model Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+
+    # Save the model
+    with open("crying_detector.pkl", "wb") as f:
+        pickle.dump(model, f)
+    print("Model saved as 'crying_detector.pkl'.")
+
+
+# Real-time audio monitoring using trained model
+def audio_test(duration=5, fs=44100):
+    # Load the trained model
+    with open("crying_detector.pkl", "rb") as f:
+        model = pickle.load(f)
+    print("Model loaded. Listening for crying sounds...")
+
+    p = pyaudio.PyAudio()
+    stream = p.open(
+        format=pyaudio.paInt16, channels=1, rate=fs, input=True, frames_per_buffer=1024
+    )
+
+    try:
+        while True:
+            # Record audio
+            frames = []
+            for _ in range(0, int(fs / 1024 * duration)):
+                data = stream.read(1024, exception_on_overflow=False)
+                frames.append(np.frombuffer(data, dtype=np.int16))
+            audio_data = np.hstack(frames)
+
+            # Extract features and predict
+            features = extract_features(audio_data)
+            if features is not None:
+                prediction = model.predict([features])
+                if prediction[0] == 1:
+                    # data = {
+                    #     "time": formatted_time,
+                    #     "Staus": "Baby Crying",
+                    # }
+
+                    # doc_ref = db.collection("cry").document()
+                    # doc_ref.set(data)
+                    print("Baby is crying!")
+                else:
+                    print("No crying detected.")
+    except KeyboardInterrupt:
+        print("Audio monitoring stopped.")
+    finally:
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+
+# Video processing function
+def main():
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
@@ -48,8 +178,8 @@ def main():
     # center_area = (frame_width // 2, frame_height // 2, frame_width // 2, frame_height // 2)
     # cv2.namedWindow('Child Monitoring System', cv2.WND_PROP_FULLSCREEN)
     # cv2.setWindowProperty('Child Monitoring System', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    audio = threading.Thread(target=aduio_test)
-    audio.start()
+    # audio = threading.Thread(target=aduio_test)
+    # audio.start()
 
     while True:
         # Read a frame from the video capture
@@ -79,6 +209,14 @@ def main():
                 ):
                     # send_email_alert()
                     print("[-] Out OF Boundary")
+
+                    # data = {
+                    #     "time": formatted_time,
+                    #     "Staus": "Out Of Boundary",
+                    # }
+
+                    # doc_ref = db.collection("boundary").document()
+                    # doc_ref.set(data)
                     initBB = None  # Reset tracker
                     tracking = False
                 # Check If Baby Crying
@@ -120,123 +258,17 @@ def main():
     cv2.destroyAllWindows()
 
 
-def aduio_test(duration=5, fs=44100):
-    p = pyaudio.PyAudio()
-    stream = p.open(
-        format=pyaudio.paInt16, channels=1, rate=fs, input=True, frames_per_buffer=1024
-    )
-    frames = []
+# Run audio and video monitoring simultaneously
+if __name__ == "__main__":
+    train_model()
+    # Start audio monitoring in a separate thread
+    audio_thread = threading.Thread(target=audio_test, daemon=True)
+    audio_thread.start()
 
-    for _ in range(0, int(fs / 1024 * duration)):
-        data = stream.read(1024)
-        frames.append(np.frombuffer(data, dtype=np.int16))
-
-    # stream.stop_stream()
-    # stream.close()
-    # p.terminate()
-
-    audio_data = np.hstack(frames)
-
-    # print (audio_data)
-    def extract_features(audio_data, fs=44100):
-        mfccs = librosa.feature.mfcc(y=audio_data.astype(float), sr=fs, n_mfcc=13)
-        chroma = librosa.feature.chroma_stft(y=audio_data.astype(float), sr=fs)
-        rmse = librosa.feature.rms(y=audio_data.astype(float))
-        zcr = librosa.feature.zero_crossing_rate(y=audio_data.astype(float))
-
-        features = np.hstack(
-            [
-                np.mean(mfccs.T, axis=0),
-                np.mean(chroma.T, axis=0),
-                np.mean(rmse.T, axis=0),
-                np.mean(zcr.T, axis=0),
-            ]
-        )
-
-        return features
-
-    def extract_features_from_file(file_path, fs=44100):
-        audio_data, _ = sf.read(file_path)
-        return extract_features(audio_data, fs)
-
-    def load_dataset(dataset_path):
-        X = []
-        y = []
-
-        for label, category in enumerate(["crying", "non_crying"]):
-            category_path = os.path.join(dataset_path)
-            for file_name in os.listdir(category_path):
-                file_path = os.path.join(category_path, file_name)
-                if file_path.endswith(".ogg"):
-                    features = extract_features_from_file(file_path)
-                    X.append(features)
-                    y.append(label)
-
-        return X, y
-
-    # Split data into training and testing sets
-    dataset_path = "data/301_Crying_baby/"
-    X, y = load_dataset(dataset_path)
-    X = np.array(X)
-    y = np.array(y)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-
-    # Train a Support Vector Classifier
-    clf = SVC()
-    clf.fit(X_train, y_train)
-
-    # Predict and evaluate
-    y_pred = clf.predict(X_test)
-    # print(X,y)
-    print("Accuracy:", accuracy_score(y_test, y_pred))
-
-    def is_crying(audio_data, classifier, fs=44100, intensity_threshold=35):
-        features = extract_features(audio_data, fs)
-        prediction = classifier.predict([features])
-        # Check intensity (RMSE) for hard crying detection
-        rmse = librosa.feature.rms(y=audio_data.astype(float))
-        average_rmse = np.mean(rmse)
-
-        return prediction[0] == 1 and average_rmse > intensity_threshold
-
-    if is_crying(audio_data, clf):
-        print("Baby is crying!")
-        data = {
-            "Crying": {
-                "Title": "The Fellowship of the Ring",
-                "Author": "J.R.R. Tolkien",
-                "Genre": "Epic fantasy",
-                "Price": 100,
-            }
-        }
-        doc_ref = db.collection("test").document()
-        doc_ref.set(data)
-        pass
-
-
-main()
+    # Start video monitoring in the main thread
+    main()
 
 # while True:
 #     aduio_test()
 # audio = threading.Thread(target=aduio_test)
 # audio.start()
-
-
-def test():
-    cred_obj = firebase_admin.credentials.Certificate(
-        "D:\\MyCodingFiles\\programming\\rafsanthegeneral\\BabyCryFirebase.json"
-    )
-    firebase_admin.initialize_app(cred_obj)
-    db = firestore.client()
-    data = {
-        "Book1": {
-            "Title": "The Fellowship of the Ring",
-            "Author": "J.R.R. Tolkien",
-            "Genre": "Epic fantasy",
-            "Price": 100,
-        }
-    }
-    doc_ref = db.collection("test").document()
-    doc_ref.set(data)
