@@ -273,6 +273,7 @@ def identify():
             matchindex = np.argmin(faceDist)
 
             if matches[matchindex]:
+
                 name = clasName[matchindex]
                 Id = ids[matchindex]
                 y1, x2, y2, x1 = faceLoc
