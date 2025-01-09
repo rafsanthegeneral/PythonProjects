@@ -10,8 +10,7 @@ import requests
 from plyer import notification
 
 
-
-firebasepath = os.getcwd() + "/lib/firebase.json"
+firebasepath = os.getcwd() + "../../../../firebase.json"
 fireStorageCredit = credentials.Certificate(firebasepath)
 firebase_admin.initialize_app(
     fireStorageCredit,
@@ -21,23 +20,22 @@ firebase_admin.initialize_app(
 
 #  This  code is Cheking From Server For If Images Already Deleted From Server
 keys = []
-for filename in os.listdir('images/known'):
-    if filename.endswith('.jpg'):
-        parts = filename.split('-')
-        keys.append("-"+parts[1].split('.jpg')[0])
-    
-ref = db.reference('/knownperson')
+for filename in os.listdir("images/known"):
+    if filename.endswith(".jpg"):
+        parts = filename.split("-")
+        keys.append("-" + parts[1].split(".jpg")[0])
+
+ref = db.reference("/knownperson")
 for x in keys:
     snapshot = ref.child(x).get()
-    if snapshot is  None:
-       imagelist = os.listdir("images/known")
-       for images in imagelist:
-         if x in images:
-            mess = "A image Called " + images + " is Delete From Storage"
-            notification.notify(title="From Server", message=mess)
-            path = os.getcwd() + "/images/known/" +images
-            os.remove(path)
-                                    
+    if snapshot is None:
+        imagelist = os.listdir("images/known")
+        for images in imagelist:
+            if x in images:
+                mess = "A image Called " + images + " is Delete From Storage"
+                notification.notify(title="From Server", message=mess)
+                path = os.getcwd() + "/images/known/" + images
+                os.remove(path)
 
 
 def handle_new_data(event):
