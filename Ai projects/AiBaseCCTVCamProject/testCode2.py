@@ -35,7 +35,8 @@ def KnownImages():
     )
     print(url)
 
-def KnownUpload():
+
+def KnownUpload(name, Type):
     config = {
         "apiKey": "AIzaSyBiP96UgQNqzcblfcNqmp8arneThFH7SQI",
         "authDomain": "kimsirproject.firebaseapp.com",
@@ -52,7 +53,9 @@ def KnownUpload():
 
     # List all images in the 'images/known' directory
     mylist = os.listdir("images/")
-    images = [image for image in mylist if image.lower().endswith(('.jpg', '.png', '.jpeg'))]
+    images = [
+        image for image in mylist if image.lower().endswith((".jpg", ".png", ".jpeg"))
+    ]
 
     # Initialize database
     db = firebase.database()
@@ -70,12 +73,13 @@ def KnownUpload():
         date = now.strftime("%Y-%m-%d")
         timee = time.strftime("%H:%M:%S", time.localtime())
         dateetimee = date + " " + timee
-        data = {"name": "known", "timestamp": dateetimee, "image_url": url}
+        data = {"name": name, "type": Type, "timestamp": dateetimee, "image_url": url}
         db.child("knownperson").push(data)
 
     # Optionally delete the local files after upload
     for image in images:
         os.remove(f"images/{image}")
+
 
 def IntruderUpload():
     config = {
@@ -242,6 +246,7 @@ def facecap():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             # img = cv2.resize(img, (0, 0), None, 0.25, 0.25)
             cv2.imwrite(f"images/{imagename}-{ids}.jpg", img)
+            KnownUpload(imagename, label)
             break
     cap.release()
     cv2.destroyAllWindows()
@@ -374,9 +379,9 @@ def identify():
 # db  = db.reference('/')
 # db.listen(identify)
 
-#identify()
-# facecap()
-KnownUpload()
+# identify()
+facecap()
+# KnownUpload()
 # KnownImages()
 
 # imagerafsan1 = face_recognition.load_image_file('images/rafsan.jpg')
