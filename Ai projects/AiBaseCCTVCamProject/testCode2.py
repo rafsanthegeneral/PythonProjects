@@ -75,10 +75,9 @@ def KnownUpload(name, Type):
         dateetimee = date + " " + timee
         data = {"name": name, "type": Type, "timestamp": dateetimee, "image_url": url}
         db.child("knownperson").push(data)
+        os.remove(f"images/{image}")
 
     # Optionally delete the local files after upload
-    for image in images:
-        os.remove(f"images/{image}")
 
 
 def IntruderUpload():
@@ -322,27 +321,53 @@ def identify():
         for encodeFace, faceLoc in zip(encodeCurrentFrame, faceCurFrame):
             matches = face_recognition.compare_faces(faceEncodeList, encodeFace)
             faceDist = face_recognition.face_distance(faceEncodeList, encodeFace)
-            matchindex = np.argmin(faceDist)
+            if len(faceDist) > 0:
+                matchindex = np.argmin(faceDist)
 
-            if matches[matchindex]:
-                name = clasName[matchindex]
-                Id = ids[matchindex]
-                y1, x2, y2, x1 = faceLoc
-                # Because Previous We reside  image 4 times so now we Multyply that
-                y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-                cv2.rectangle(imgWithBG, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.rectangle(
-                    imgWithBG, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED
-                )
-                cv2.putText(
-                    imgWithBG,
-                    f"{name}",
-                    (x1 + 6, y2 - 6),
-                    cv2.FONT_HERSHEY_COMPLEX,
-                    1,
-                    (255, 255, 255),
-                    2,
-                )
+                if matches[matchindex]:
+                    name = clasName[matchindex]
+                    Id = ids[matchindex]
+                    y1, x2, y2, x1 = faceLoc
+                    # Because Previous We reside  image 4 times so now we Multyply that
+                    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                    cv2.rectangle(imgWithBG, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.rectangle(
+                        imgWithBG, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED
+                    )
+                    cv2.putText(
+                        imgWithBG,
+                        f"{name}",
+                        (x1 + 6, y2 - 6),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        1,
+                        (255, 255, 255),
+                        2,
+                    )
+                else:
+                    y1, x2, y2, x1 = faceLoc
+                    # Because Previous We reside  image 4 times so now we Multyply that
+                    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                    cv2.rectangle(imgWithBG, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.rectangle(
+                        imgWithBG, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED
+                    )
+                    cv2.putText(
+                        imgWithBG,
+                        "Unknown",
+                        (x1 + 6, y2 - 6),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        1,
+                        (255, 255, 255),
+                        2,
+                    )
+                    date = now.strftime("%Y-%m-%d %H:%M:%S")
+                    timee = time.strftime("%H:%M:%S", time.localtime())
+                    dateetimee = date + timee
+                    cv2.imwrite(f"images/unknown/{dateetimee}.jpg", imgWithOutBg)
+                    # ------- if image Write then Run that Firebase update Code ----------
+                    IntruderUpload()
+                    # my_thread = threading.Thread(target=IntruderUpload)
+                    # my_thread.start()
             else:
                 y1, x2, y2, x1 = faceLoc
                 # Because Previous We reside  image 4 times so now we Multyply that
@@ -362,7 +387,7 @@ def identify():
                 )
                 date = now.strftime("%Y-%m-%d %H:%M:%S")
                 timee = time.strftime("%H:%M:%S", time.localtime())
-                dateetimee = date + timee
+                dateetimee = timee
                 cv2.imwrite(f"images/unknown/{dateetimee}.jpg", imgWithOutBg)
                 # ------- if image Write then Run that Firebase update Code ----------
 
@@ -379,8 +404,8 @@ def identify():
 # db  = db.reference('/')
 # db.listen(identify)
 
-# identify()
-facecap()
+identify()
+# facecap()
 # KnownUpload()
 # KnownImages()
 
