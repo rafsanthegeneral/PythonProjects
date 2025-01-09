@@ -95,7 +95,7 @@ def facecap():
     labels = ["Female", "Male"]
     # Make and Femail Detect Mechanizm finished
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     # cv2.namedWindow('Video', cv2.WINDOW_FREERATIO)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -333,8 +333,8 @@ def identify():
 # db  = db.reference('/')
 # db.listen(identify)
 
-identify()
-# facecap()
+# identify()
+facecap()
 # KnownImages()
 
 # imagerafsan1 = face_recognition.load_image_file('images/rafsan.jpg')
